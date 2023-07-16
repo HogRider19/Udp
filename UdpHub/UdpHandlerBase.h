@@ -3,22 +3,24 @@
 #include <QObject>
 #include <stdexcept>
 
-class Server
+
+class UdpHandlerBase
 {
 public:
-	Server(std::string host, int port);
-	~Server();
-	void Start();
+	UdpHandlerBase(std::string host, int port = 60000);
 	void SignInterruptedDataHandler(void(*handler)(QByteArray data));
-	
+	void Send(std::string host, int port, QByteArray data, int blockSize);
 
-private:
+protected:
+	std::list<std::string> _listenersHosts;
 	QUdpSocket _socket;
 	void(*_interruptedDataHandler)(QByteArray data) = NULL;
 	int _prevCountRemainingDatagrams = 1;
 	QByteArray _data;
+	std::string _host;
+	int _port;
 
-	void processPendingDatagrams();
+	QByteArray processPendingDatagrams();
 	static int takeCountRemainingDatagrams(QByteArray& datagram);
 };
 
